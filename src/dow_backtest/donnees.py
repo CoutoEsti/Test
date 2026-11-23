@@ -31,8 +31,11 @@ def telecharger_yahoo(symbole: str) -> pd.DataFrame:
     )
 
 
-def nettoyer(brut: pd.DataFrame, symbole: str) -> pd.DataFrame:
-    """Colonnes standard, dates triees, sans doublon ni prix invalide."""
+def nettoyer(brut: pd.DataFrame, symbole: str, prix_positifs: bool = True) -> pd.DataFrame:
+    """Colonnes standard, dates triees, sans doublon ni prix invalide.
+
+    `prix_positifs=False` pour un taux d'interet (il peut etre nul ou negatif).
+    """
     if brut is None or brut.empty:
         raise ErreurDonnees(f"Aucune donnee recue pour {symbole}. Symbole inconnu ?")
     df = brut.copy()
@@ -51,7 +54,7 @@ def nettoyer(brut: pd.DataFrame, symbole: str) -> pd.DataFrame:
     df = df.dropna(subset=["Close"])
     if df.empty:
         raise ErreurDonnees(f"Aucun prix de cloture valide pour {symbole}.")
-    if (df["Close"] <= 0).any():
+    if prix_positifs and (df["Close"] <= 0).any():
         raise ErreurDonnees(f"Prix negatif ou nul dans les donnees de {symbole}.")
     return df
 
@@ -75,6 +78,7 @@ def charger(
     dossier: Path | None = None,
     source: Callable[[str], pd.DataFrame] | None = None,
     rafraichir: bool = False,
+    prix_positifs: bool = True,
 ) -> pd.DataFrame:
     """Prix journaliers de `symbole` entre `debut` et `fin` (inclus).
 
@@ -86,7 +90,7 @@ def charger(
     if fichier.exists() and not rafraichir:
         try:
             df = pd.read_csv(fichier, index_col="Date", parse_dates=True)
-            df = nettoyer(df, symbole)
+            df = nettoyer(df, symbole, prix_positifs)
         except (ValueError, KeyError, ErreurDonnees) as e:
             raise ErreurDonnees(
                 f"Copie locale illisible : {fichier}. Relance avec --rafraichir. ({e})"
@@ -99,7 +103,7 @@ def charger(
                 f"Telechargement de {symbole} impossible ({e}). "
                 "Verifie ta connexion et reessaie dans quelques minutes."
             ) from e
-        df = nettoyer(brut, symbole)
+        df = nettoyer(brut, symbole, prix_positifs)
         _ecrire_tout_ou_rien(df, fichier)
 
     resultat = df.loc[debut:fin]
@@ -109,3 +113,11 @@ def charger(
             f"Donnees disponibles : {df.index[0].date()} a {df.index[-1].date()}."
         )
     return resultat
+
+
+def charger_taux(fin: str | None = None, rafraichir: bool = False, **options) -> pd.Series:
+    """Taux annuel de l'argent comptant (bons du Tresor), en decimal : 0.05 = 5 %."""
+    df = charger(
+        config.SYMBOLE_TAUX, fin=fin, rafraichir=rafraichir, prix_positifs=False, **options
+    )
+    return (df["Close"] / 100).rename("taux_annuel")

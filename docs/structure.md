@@ -29,6 +29,7 @@ ml/                     notebook existant, hors projet, ne pas toucher
 - Achat : dernier creux confirme plus haut que le precedent ET cloture au-dessus du dernier sommet.
 - Vente : cloture sous le dernier creux confirme.
 - Decision a la cloture du jour t, execution a la cloture du jour t+1, gain compte a partir de t+2.
+- Hors du marche : l'argent comptant rapporte le taux ^IRX connu la veille.
 - N = 10 par defaut, choisi avant de voir les resultats.
 
 ## Version 2 : confirmation
@@ -48,7 +49,8 @@ ml/                     notebook existant, hors projet, ne pas toucher
 | CI | GitHub Actions, Linux + Windows |
 | Outil | uv (MIT/Apache) : memes commandes sur Windows et Linux |
 | Librairie de backtest | Aucune, faite maison (backtesting.py est AGPL, et le notre est teste) |
-| Taux sans risque | Ignore dans le Sharpe (simplification, l'argent comptant ne rapporte rien ici) |
+| Interet sur l'argent comptant | Taux des bons du Tresor US 13 semaines (^IRX), celui de la veille. Desactivable : --sans-interet |
+| Sharpe | Rendement au-dessus du taux ^IRX, divise par la volatilite |
 
 ## Angles morts [TOUS]
 | Point | Reponse |
@@ -61,4 +63,3 @@ ml/                     notebook existant, hors projet, ne pas toucher
 | Documentation | README.md + ce fichier. |
 | Publication (type outil ligne de commande) | Pas necessaire : rien n'est publie. |
 | Biais du survivant | Pas concerne : SPY est un fonds indiciel, pas une selection d'actions. |
-| Interet sur l'argent comptant | Ignore : desavantage la strategie (elle est 50 % du temps en argent comptant). |

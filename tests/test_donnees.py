@@ -97,3 +97,11 @@ def test_copie_locale_corrompue(tmp_path):
 
 def test_nom_de_fichier_sans_caractere_special(tmp_path):
     assert donnees.fichier_cache("^DJI", tmp_path).name == "_DJI.csv"
+
+
+def test_taux_negatif_accepte_et_converti_en_decimal(tmp_path):
+    def faux_taux(symbole):
+        return prix_complets(serie([5.0, 0.0, -0.1]))
+
+    taux = donnees.charger_taux(dossier=tmp_path, source=faux_taux)
+    assert taux.tolist() == pytest.approx([0.05, 0.0, -0.001])

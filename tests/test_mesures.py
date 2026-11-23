@@ -43,3 +43,17 @@ def test_transactions_et_temps_investi():
 def test_sharpe_non_defini_si_aucune_variation():
     m = mesures.calculer(resultat([100] * 5, investi=[0] * 5))
     assert math.isnan(m["sharpe"])
+
+
+def test_sharpe_mesure_le_rendement_au_dessus_du_taux():
+    index = pd.date_range("2000-01-01", periods=4, freq="D")
+    taux_jour = pd.Series([0.001, 0.002, 0.001, 0.002], index=index)
+    res = pd.DataFrame(
+        {
+            "capital": (1 + taux_jour).cumprod() * 100,
+            "rendement": taux_jour,  # rapporte exactement le taux : aucun excedent
+            "investi": 0,
+            "taux_jour": taux_jour,
+        }
+    )
+    assert math.isnan(mesures.calculer(res)["sharpe"])

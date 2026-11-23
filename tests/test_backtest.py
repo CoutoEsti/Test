@@ -52,3 +52,37 @@ def test_debut_apres_les_donnees_est_une_erreur():
     c = serie([100, 101])
     with pytest.raises(ValueError):
         backtest.acheter_et_garder(c, debut="2050-01-01")
+
+
+def test_argent_comptant_rapporte_le_taux():
+    c = serie([100] * 253)
+    taux = pd.Series(0.05, index=c.index)
+    jamais = pd.Series(0, index=c.index)
+    res = backtest.lancer(c, jamais, frais=0.0, capital_initial=1000, taux_annuel=taux)
+    # 252 jours d'interet (le premier jour n'a pas de taux "de la veille")
+    assert res["capital"].iloc[-1] == pytest.approx(1000 * (1 + 0.05 / 252) ** 252)
+
+
+def test_pas_d_interet_les_jours_investis():
+    c = serie([100, 101, 99, 105, 110, 108, 120])
+    taux = pd.Series(0.05, index=c.index)
+    debut = str(c.index[2].date())
+    avec = backtest.acheter_et_garder(c, frais=0.0, debut=debut, taux_annuel=taux)
+    sans = backtest.acheter_et_garder(c, frais=0.0, debut=debut)
+    assert avec["capital"].iloc[-1] == pytest.approx(sans["capital"].iloc[-1])
+
+
+def test_anti_triche_le_taux_utilise_est_celui_de_la_veille():
+    c = serie([100] * 5)
+    taux = pd.Series([0.0, 0.0, 2.52, 0.0, 0.0], index=c.index)  # pic au jour 2
+    jamais = pd.Series(0, index=c.index)
+    res = backtest.lancer(c, jamais, frais=0.0, taux_annuel=taux)
+    assert list(res["taux_jour"]) == pytest.approx([0, 0, 0, 0.01, 0])  # touche le jour 3
+
+
+def test_taux_avec_dates_differentes_des_prix():
+    c = serie([100] * 6)
+    avant = c.index[0] - pd.Timedelta(days=10)
+    taux = pd.Series([0.0252], index=[avant])  # une seule valeur, connue avant les prix
+    res = backtest.lancer(c, pd.Series(0, index=c.index), frais=0.0, taux_annuel=taux)
+    assert res["taux_jour"].iloc[1:].tolist() == pytest.approx([0.0001] * 5)

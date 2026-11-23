@@ -22,7 +22,10 @@ def calculer(resultat: pd.DataFrame) -> dict:
     ecart_type = rendement.std()
     jours = config.JOURS_BOURSE_PAR_AN
     volatilite = ecart_type * math.sqrt(jours)
-    sharpe = rendement.mean() / ecart_type * math.sqrt(jours) if ecart_type > 0 else math.nan
+    # Sharpe : rendement AU-DESSUS du taux sans risque, divise par le risque.
+    excedent = rendement - resultat["taux_jour"] if "taux_jour" in resultat else rendement
+    ecart_excedent = excedent.std()
+    sharpe = excedent.mean() / ecart_excedent * math.sqrt(jours) if ecart_excedent > 0 else math.nan
     investi = resultat["investi"]
     transactions = int(investi.diff().abs().fillna(0).sum() + investi.iloc[0])
     return {

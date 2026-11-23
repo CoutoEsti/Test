@@ -40,6 +40,11 @@ def _arguments(argv):
         action="store_true",
         help="Periode cachee (2016 a aujourd'hui). A faire UNE seule fois.",
     )
+    p.add_argument(
+        "--sans-interet",
+        action="store_true",
+        help="L'argent comptant ne rapporte rien (par defaut : taux des bons du Tresor)",
+    )
     p.add_argument("--rafraichir", action="store_true", help="Re-telecharge les donnees")
     return p.parse_args(argv)
 
@@ -73,12 +78,19 @@ def _decision(args, cloture, fenetre, fin):
     return combine.reindex(cloture.index, method="ffill").fillna(0)
 
 
-def _robustesse(args, cloture, debut, fin):
+def _taux(args, fin):
+    """Taux de l'argent comptant, ou None si --sans-interet."""
+    return None if args.sans_interet else donnees.charger_taux(fin, args.rafraichir)
+
+
+def _robustesse(args, cloture, debut, fin, taux):
     lignes = {}
     for n in config.FENETRES_ROBUSTESSE:
-        res = backtest.lancer(cloture, _decision(args, cloture, n, fin), args.frais, debut=debut)
+        decision = _decision(args, cloture, n, fin)
+        res = backtest.lancer(cloture, decision, args.frais, debut=debut, taux_annuel=taux)
         lignes[f"N={n}"] = mesures.calculer(res)
-    ref = mesures.calculer(backtest.acheter_et_garder(cloture, args.frais, debut=debut))
+    ref_brut = backtest.acheter_et_garder(cloture, args.frais, debut=debut, taux_annuel=taux)
+    ref = mesures.calculer(ref_brut)
     lignes["Acheter-garder"] = ref
     print(f"\nRobustesse {args.symbole} {debut} -> {fin}\n")
     print(rapport.tableau(lignes))
@@ -94,19 +106,22 @@ def executer(argv=None) -> int:
     # On charge l'historique jusqu'a `fin` (rien apres) : la strategie ne voit pas le futur.
     prix = donnees.charger(args.symbole, fin=fin, rafraichir=args.rafraichir)
     cloture = prix["Close"]
+    taux = _taux(args, fin)
 
     if args.robustesse:
-        _robustesse(args, cloture, debut, fin)
+        _robustesse(args, cloture, debut, fin, taux)
         return 0
 
     nom = "Dow confirmation" if args.confirmation else f"Dow (N={args.fenetre})"
     decision = _decision(args, cloture, args.fenetre, fin)
-    strat = backtest.lancer(cloture, decision, args.frais, debut=debut)
-    ref = backtest.acheter_et_garder(cloture, args.frais, debut=debut)
+    strat = backtest.lancer(cloture, decision, args.frais, debut=debut, taux_annuel=taux)
+    ref = backtest.acheter_et_garder(cloture, args.frais, debut=debut, taux_annuel=taux)
     debut_reel = strat.index[0].date()
     fin_reelle = strat.index[-1].date()
 
-    print(f"{args.symbole} du {debut_reel} au {fin_reelle}, frais {args.frais * 100:.2f} %\n")
+    interet = "sans interet" if args.sans_interet else f"interet {config.SYMBOLE_TAUX}"
+    frais = f"frais {args.frais * 100:.2f} %"
+    print(f"{args.symbole} du {debut_reel} au {fin_reelle}, {frais}, {interet}\n")
     print(rapport.tableau({nom: mesures.calculer(strat), "Acheter-garder": mesures.calculer(ref)}))
 
     suffixe = "confirmation" if args.confirmation else f"N{args.fenetre}"

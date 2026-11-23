@@ -5,6 +5,7 @@ from pathlib import Path
 # Marche
 SYMBOLE_DEFAUT = "SPY"
 INDICES_DOW = ("^DJI", "^DJT")  # Industrielles et Transports (version 2 : confirmation)
+SYMBOLE_TAUX = "^IRX"  # Taux des bons du Tresor US 13 semaines (en %, annuel)
 
 # Periodes
 DEBUT_DEVELOPPEMENT = "1993-01-01"
