@@ -19,6 +19,7 @@ FENETRES_ROBUSTESSE = (5, 10, 15, 20, 25, 30)
 # Backtest
 FRAIS_PAR_TRANSACTION = 0.001  # 0,1 % du montant a chaque achat ou vente
 CAPITAL_INITIAL = 10_000.0
+RISQUE_PAR_TRANSACTION = 100.0  # $ de perte prevue si le stop (dernier creux) est touche
 JOURS_BOURSE_PAR_AN = 252
 
 # Dossiers (relatifs au dossier ou la commande est lancee)

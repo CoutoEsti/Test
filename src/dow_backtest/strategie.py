@@ -25,11 +25,18 @@ def _derniers_niveaux(pivots: pd.DataFrame, type_pivot: str, index: pd.Index):
     return dernier.to_numpy(), precedent.to_numpy()
 
 
-def etat_tendance(cloture: pd.Series, fenetre: int) -> pd.Series:
-    """1 = tendance haussiere selon Dow, 0 = sinon. Decision a la cloture de chaque jour."""
+def niveaux(cloture: pd.Series, fenetre: int) -> pd.DataFrame:
+    """Pour chaque jour : h1 (dernier sommet), l1 et l0 (dernier et avant-dernier creux) connus."""
     pivots = trouver_pivots(cloture, fenetre)
     h1, _ = _derniers_niveaux(pivots, HAUT, cloture.index)
     l1, l0 = _derniers_niveaux(pivots, BAS, cloture.index)
+    return pd.DataFrame({"h1": h1, "l1": l1, "l0": l0}, index=cloture.index)
+
+
+def etat_tendance(cloture: pd.Series, fenetre: int) -> pd.Series:
+    """1 = tendance haussiere selon Dow, 0 = sinon. Decision a la cloture de chaque jour."""
+    n = niveaux(cloture, fenetre)
+    h1, l1, l0 = n["h1"].to_numpy(), n["l1"].to_numpy(), n["l0"].to_numpy()
     c = cloture.to_numpy(dtype=float)
 
     # Les comparaisons avec NaN donnent False : pas de signal tant qu'il manque des pivots.

@@ -6,7 +6,7 @@ from datetime import date
 
 import pandas as pd
 
-from dow_backtest import backtest, config, donnees, mesures, rapport, strategie
+from dow_backtest import backtest, config, donnees, mesures, rapport, strategie, transactions
 from dow_backtest.donnees import ErreurDonnees
 
 
@@ -24,6 +24,12 @@ def _arguments(argv):
         type=float,
         default=config.FRAIS_PAR_TRANSACTION,
         help="ex: 0.001 = 0,1 %% par transaction",
+    )
+    p.add_argument(
+        "--risque",
+        type=float,
+        default=config.RISQUE_PAR_TRANSACTION,
+        help="$ de perte prevue par transaction si le stop (dernier creux) est touche",
     )
     p.add_argument(
         "--confirmation",
@@ -133,7 +139,15 @@ def executer(argv=None) -> int:
         config.DOSSIER_RAPPORTS / f"{base}.png",
     )
     strat.to_csv(config.DOSSIER_RAPPORTS / f"{base}.csv")
+
+    stops = strategie.niveaux(cloture, args.fenetre)["l1"]
+    liste = transactions.extraire(cloture, strat, stops, args.frais, args.risque)
+    print("\n" + transactions.texte(transactions.statistiques(liste, args.risque)))
+    fichier_transactions = config.DOSSIER_RAPPORTS / f"{base}_transactions.csv"
+    liste.to_csv(fichier_transactions, index=False)
+
     print(f"\nGraphique : {image}")
+    print(f"Transactions : {fichier_transactions}")
     print(f"Detail jour par jour : {config.DOSSIER_RAPPORTS / (base + '.csv')}")
     return 0
 

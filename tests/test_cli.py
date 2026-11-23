@@ -25,6 +25,8 @@ def test_lancement_complet_produit_tableau_et_graphique(faux_marche, capsys):
     sortie = capsys.readouterr().out
     assert "Acheter-garder" in sortie
     assert "Pire baisse" in sortie
+    assert "Taux de reussite" in sortie
+    assert list((faux_marche / "rapports").glob("*_transactions.csv"))
     assert list((faux_marche / "rapports").glob("*.png"))
     assert list((faux_marche / "rapports").glob("*.csv"))
 
