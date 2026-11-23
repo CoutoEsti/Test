@@ -8,6 +8,7 @@
 - Mesures, tableau, graphique, CSV jour par jour.
 - Commande : --robustesse (N de 5 a 30), --confirmation, --test-final (protege).
 
+- Transactions : taux de reussite, facteur de profit, simulation 100 $ de risque par transaction.
 - Interet sur l'argent comptant (^IRX, taux de la veille) et Sharpe au-dessus du taux sans risque.
 
 ## Premiers resultats SANS interet (1993 a 2015, SPY, frais 0,1 %, Sharpe sans taux)
@@ -46,3 +47,22 @@ Reproduire une ligne : `uv run dow-backtest QQQ` (remplacer le symbole).
 Lecture : la strategie gagne seulement quand la periode contient un long marche baissier
 (depart juste avant 2000, Japon). Elle reduit toujours beaucoup la pire baisse.
 Sur un marche qui monte regulierement, elle rapporte moins.
+
+## TEST FINAL (periode cachee 2016-01-04 a 2026-11-20, lance une seule fois le 2026-11-23)
+Pre-enregistrement : docs/structure.md, commit 95385a3, pousse AVANT le lancement.
+
+| | Dow confirmation (officielle) | Dow simple N=10 (secondaire) | Acheter-garder |
+|---|---|---|---|
+| Rendement par an | 4,9 % | 8,2 % | 13,8 % |
+| Pire baisse | -21,1 % | -10,7 % | -33,7 % |
+| Sharpe | 0,32 | 0,61 | 0,69 |
+| Taux de reussite | 61,5 % (13 transactions) | 71,4 % (14) | - |
+| 100 $ de risque par transaction | +1 453 $ (+1,12 R en moyenne) | +2 013 $ (+1,44 R) | - |
+| Plus gros montant investi | 7 382 $ | 4 825 $ | - |
+
+Verdict selon les criteres decides avant :
+- Bat le marche : NON (4,9 % contre 13,8 % par an).
+- Meilleur rapport gain / risque : NON (Sharpe 0,32 contre 0,69, meme si la pire baisse est plus petite).
+- Conclusion : sur 2016-2026, la Dow Theory ne vaut pas mieux qu'acheter et garder SPY.
+- La version simple a fait mieux que la version officielle sur cette periode. On ne change PAS
+  de version apres coup : ce serait choisir avec la reponse sous les yeux.

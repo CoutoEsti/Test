@@ -1,7 +1,7 @@
 # A faire
 
-- [ ] Test final sur la periode cachee (2016 a aujourd'hui) : decision de l'utilisateur, UNE seule fois.
-      Choisir AVANT quelle version compte (N=10 seule ou confirmation). Ne plus rien changer apres.
+- [x] Test final fait le 2026-11-23 (voir docs/Fait.md). La periode cachee est maintenant "brulee" :
+      tout nouveau reglage teste dessus n'a plus valeur de preuve.
 
 ## Ecarte
 - Regle de volume de la Dow Theory : ecartee. Pas de definition objective reconnue,
