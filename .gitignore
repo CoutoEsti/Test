@@ -1,0 +1,25 @@
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Donnees et sorties (re-generables)
+data/
+rapports/
+
+# Editeurs / systeme
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

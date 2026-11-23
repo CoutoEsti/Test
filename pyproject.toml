@@ -1,0 +1,40 @@
+[project]
+name = "dow-backtest"
+version = "0.1.0"
+description = "Backtest de la Dow Theory sur des donnees de marche historiques."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.2",
+    "numpy>=2.0",
+    "yfinance>=1.0",
+    "matplotlib>=3.9",
+]
+
+[project.scripts]
+dow-backtest = "dow_backtest.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dow_backtest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["ml", ".claude"]  # notebook existant et garde-fou du kit (style d'origine)
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
