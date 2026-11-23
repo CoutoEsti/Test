@@ -29,3 +29,20 @@ Choisir N d'apres ce tableau serait du surajustement : N=10 reste le reglage off
 | Pire baisse | -21,5 % | -18,1 % | -55,2 % |
 | Sharpe (au-dessus du taux) | 0,22 | 0,43 | 0,41 |
 | Temps investi | 42,5 % | 44,4 % | 100 % |
+
+## Autres marches (version 1, N=10, avec interet, du debut des donnees a 2015)
+Reproduire une ligne : `uv run dow-backtest QQQ` (remplacer le symbole).
+| Marche | Debut | Dow / an | Acheter-garder / an | Pire baisse Dow | Pire baisse A-G | Sharpe Dow | Sharpe A-G |
+|---|---|---|---|---|---|---|---|
+| S&P 500 SPY | 1993 | 4,2 % | 8,9 % | -21,5 % | -55,2 % | 0,22 | 0,41 |
+| Dow Jones DIA | 1998 | 5,3 % | 6,9 % | -17,0 % | -51,9 % | 0,43 | 0,34 |
+| Nasdaq 100 QQQ | 1999 | 7,1 % | 5,3 % | -25,8 % | -83,0 % | 0,43 | 0,26 |
+| Petites entreprises IWM | 2000 | 6,1 % | 7,1 % | -19,6 % | -58,6 % | 0,43 | 0,34 |
+| Canada EWC | 1996 | 6,2 % | 7,2 % | -23,1 % | -60,8 % | 0,36 | 0,32 |
+| Hors US EFA | 2001 | 5,1 % | 4,9 % | -15,5 % | -61,0 % | 0,41 | 0,27 |
+| Japon EWJ | 1996 | 2,7 % | 0,1 % | -23,9 % | -58,9 % | 0,09 | 0,04 |
+| S&P 500 ^GSPC (sans dividendes) | 1927 | 4,2 % | 5,5 % | -48,3 % | -86,2 % | 0,16 | 0,22 |
+
+Lecture : la strategie gagne seulement quand la periode contient un long marche baissier
+(depart juste avant 2000, Japon). Elle reduit toujours beaucoup la pire baisse.
+Sur un marche qui monte regulierement, elle rapporte moins.

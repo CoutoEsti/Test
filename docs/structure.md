@@ -63,3 +63,15 @@ ml/                     notebook existant, hors projet, ne pas toucher
 | Documentation | README.md + ce fichier. |
 | Publication (type outil ligne de commande) | Pas necessaire : rien n'est publie. |
 | Biais du survivant | Pas concerne : SPY est un fonds indiciel, pas une selection d'actions. |
+
+## Test final pre-enregistre (ecrit et commite AVANT de lancer)
+- Version officielle : Dow confirmation (^DJI + ^DJT), N=10, frais 0,1 %, interet ^IRX, trade sur SPY.
+  Choisie parce qu'elle etait la meilleure sur la periode de developpement (1993-2015).
+- Version secondaire rapportee aussi, mais pas choisie apres coup : Dow simple N=10.
+- Periode : 2016-01-01 a la derniere donnee disponible.
+- Commande : uv run dow-backtest SPY --confirmation --test-final
+- Criteres decides avant :
+  - "Bat le marche" : rendement par an superieur a acheter-garder.
+  - "Meilleur rapport gain / risque" : Sharpe superieur ET pire baisse plus petite qu'acheter-garder.
+  - Sinon : la strategie ne vaut pas mieux qu'acheter et garder sur cette periode.
+- Apres le test : plus aucun reglage ne change sur la base de ce resultat.
